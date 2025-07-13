@@ -1,0 +1,166 @@
+version: '3.8'
+
+services:
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    networks:
+      - microservices-network
+
+  # User Management Service
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=sqlite:///shared_microservices.db
+      - SECRET_KEY=corporate-food-ordering-secret-key-2025
+      - SERVICE_PORT=8001
+    volumes:
+      - ./shared_microservices.db:/app/shared_microservices.db
+    networks:
+      - microservices-network
+
+  # Cafe Management Service
+  cafe-service:
+    build:
+      context: ./services/cafe-service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=sqlite:///shared_microservices.db
+      - SECRET_KEY=corporate-food-ordering-secret-key-2025
+      - SERVICE_PORT=8002
+    depends_on:
+      - user-service
+    volumes:
+      - ./shared_microservices.db:/app/shared_microservices.db
+    networks:
+      - microservices-network
+
+  # Menu Management Service
+  menu-service:
+    build:
+      context: ./services/menu-service
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - DATABASE_URL=sqlite:///shared_microservices.db
+      - SECRET_KEY=corporate-food-ordering-secret-key-2025
+      - SERVICE_PORT=8003
+    depends_on:
+      - user-service
+      - cafe-service
+    volumes:
+      - ./shared_microservices.db:/app/shared_microservices.db
+    networks:
+      - microservices-network
+
+  # Feedback Management Service
+  feedback-service:
+    build:
+      context: ./services/feedback-service
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      - DATABASE_URL=sqlite:///shared_microservices.db
+      - SECRET_KEY=corporate-food-ordering-secret-key-2025
+      - SERVICE_PORT=8004
+    depends_on:
+      - user-service
+    volumes:
+      - ./shared_microservices.db:/app/shared_microservices.db
+    networks:
+      - microservices-network
+
+  # Admin Management Service
+  admin-service:
+    build:
+      context: ./services/admin-service
+      dockerfile: Dockerfile
+    ports:
+      - "8005:8005"
+    environment:
+      - DATABASE_URL=sqlite:///shared_microservices.db
+      - SECRET_KEY=corporate-food-ordering-secret-key-2025
+      - SERVICE_PORT=8005
+    depends_on:
+      - user-service
+    volumes:
+      - ./shared_microservices.db:/app/shared_microservices.db
+    networks:
+      - microservices-network
+
+  # Order Management Service (Future Implementation)
+  order-service:
+    build:
+      context: ./services/order-service
+      dockerfile: Dockerfile
+    ports:
+      - "8006:8006"
+    environment:
+      - DATABASE_URL=sqlite:///shared_microservices.db
+      - SECRET_KEY=corporate-food-ordering-secret-key-2025
+      - SERVICE_PORT=8006
+    depends_on:
+      - user-service
+      - cafe-service
+      - menu-service
+    volumes:
+      - ./shared_microservices.db:/app/shared_microservices.db
+    networks:
+      - microservices-network
+
+  # Payment Processing Service (Future Implementation)
+  payment-service:
+    build:
+      context: ./services/payment-service
+      dockerfile: Dockerfile
+    ports:
+      - "8007:8007"
+    environment:
+      - DATABASE_URL=sqlite:///shared_microservices.db
+      - SECRET_KEY=corporate-food-ordering-secret-key-2025
+      - SERVICE_PORT=8007
+    depends_on:
+      - user-service
+    volumes:
+      - ./shared_microservices.db:/app/shared_microservices.db
+    networks:
+      - microservices-network
+
+  # Notification Service (Future Implementation)
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "8008:8008"
+    environment:
+      - DATABASE_URL=sqlite:///shared_microservices.db
+      - SECRET_KEY=corporate-food-ordering-secret-key-2025
+      - SERVICE_PORT=8008
+    depends_on:
+      - user-service
+    volumes:
+      - ./shared_microservices.db:/app/shared_microservices.db
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge

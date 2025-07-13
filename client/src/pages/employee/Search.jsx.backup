@@ -1,0 +1,294 @@
+import { useState, useEffect } from 'react'
+import { useSearchParams, Link } from 'react-router-dom'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { employeeAPI } from '@/lib/api'
+import { useCartStore } from '@/store/cartStore'
+import { formatCurrency } from '@/lib/utils'
+import { toast } from '@/hooks/use-toast'
+// Removed WebSocket import to fix connection issues
+import { 
+  ArrowLeft, 
+  Search as SearchIcon, 
+  Plus, 
+  Minus,
+  MapPin,
+  Clock,
+  ShoppingCart
+} from 'lucide-react'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
+
+const Search = () => {
+  const [searchParams] = useSearchParams()
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
+  const [searchResults, setSearchResults] = useState([])
+  const [categories, setCategories] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const { addItem, updateQuantity, getItemCount, items } = useCartStore()
+
+  useEffect(() => {
+    loadCategories()
+    if (searchQuery) {
+      performSearch(searchQuery)
+    }
+  }, [])
+
+  const loadCategories = async () => {
+    try {
+      const response = await employeeAPI.getCategories()
+      setCategories(response.data)
+    } catch (error) {
+      console.error('Failed to load categories:', error)
+    }
+  }
+
+  const performSearch = async (query) => {
+    if (!query.trim()) return
+    
+    setLoading(true)
+    try {
+      const response = await employeeAPI.searchFoodItems(query, selectedCategory)
+      setSearchResults(response.data)
+    } catch (error) {
+      toast({
+        title: "Search Error",
+        description: "Failed to search food items. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    performSearch(searchQuery)
+  }
+
+  const handleAddToCart = (menuItem, cafe) => {
+    addItem({
+      id: menuItem.id,
+      name: menuItem.name,
+      price: menuItem.price,
+      quantity: 1,
+    }, cafe.id, cafe.name)
+    
+    toast({
+      title: "Added to Cart",
+      description: `${menuItem.name} has been added to your cart.`,
+    })
+  }
+
+  // WebSocket message handler for real-time stock updates
+    console.log('Search page - Received WebSocket message:', data)
+    
+    if (data.type === 'menu_item_stock_update') {
+      console.log('Stock update message received for item:', data.menu_item_id)
+      
+      // Update the specific menu item in search results
+      setSearchResults(prev => prev.map(result => 
+        result.menu_item.id === data.menu_item_id 
+          ? { 
+              ...result, 
+              menu_item: {
+                ...result.menu_item,
+                is_available: data.is_available,
+                available_quantity: data.available_quantity
+              }
+            }
+          : result
+      ))
+      
+      // Show notification if item is out of stock
+      if (!data.is_available) {
+        toast({
+          title: "Item Updated",
+          description: `${data.menu_item_name} is now out of stock.`,
+        })
+      }
+      
+      console.log('Search results updated for stock change')
+    } else {
+      console.log('Message type:', data.type, 'not handled in Search page')
+    }
+  }
+
+
+  const getCategoryName = (categoryId) => {
+    const category = categories.find(cat => cat.id === categoryId)
+    return category ? category.name : 'Unknown'
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 employee-theme">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <Link to="/employee" className="mr-4">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <h1 className="text-2xl font-bold text-gray-800">Search Food</h1>
+          </div>
+          <ThemeToggle />
+        </div>
+
+        {/* Search Form */}
+        <Card className="mb-6">
+          <CardContent className="p-4">
+            <form onSubmit={handleSearch} className="space-y-4">
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    type="text"
+                    placeholder="Search for food items..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="mobile-touch-target"
+                  />
+                </div>
+                <Button type="submit" variant="employee" disabled={loading}>
+                  <SearchIcon className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {/* Category Filter */}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory(null)}
+                  className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                    selectedCategory === null
+                      ? 'bg-employee-primary text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  All Categories
+                </button>
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                      selectedCategory === category.id
+                        ? 'bg-employee-primary text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Search Results */}
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-employee-primary mx-auto"></div>
+            <p className="mt-2 text-gray-600">Searching...</p>
+          </div>
+        ) : searchResults.length > 0 ? (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Found {searchResults.length} result(s) for "{searchQuery}"
+            </h2>
+            {searchResults.map((result) => (
+              <Card key={`${result.menu_item.id}-${result.cafe.id}`} className="food-card food-card-employee">
+                <CardContent className="p-5">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1 pr-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-bold text-lg text-gray-800">{result.menu_item.name}</h3>
+                        <Badge variant="outline" className="text-xs">
+                          {getCategoryName(result.menu_item.category_id)}
+                        </Badge>
+                        {result.menu_item.available_quantity <= 5 && result.menu_item.available_quantity > 0 && (
+                          <Badge variant="outline" className="text-xs border-employee-accent text-employee-accent">
+                            Only {result.menu_item.available_quantity} left
+                          </Badge>
+                        )}
+                        {!result.menu_item.is_available && (
+                          <Badge variant="destructive" className="text-xs">Unavailable</Badge>
+                        )}
+                      </div>
+                      
+                      <p className="text-gray-600 text-sm mb-3 leading-relaxed">
+                        {result.menu_item.description}
+                      </p>
+                      
+                      <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          <span>{result.cafe.name}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <span>{result.menu_item.preparation_time} min</span>
+                        </div>
+                        <span>Stock: {result.menu_item.available_quantity}</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-xl font-bold text-employee-primary">
+                          {formatCurrency(result.menu_item.price)}
+                        </span>
+                        
+                        <div className="flex gap-2">
+                          <Link to={`/employee/cafes/${result.cafe.id}`}>
+                            <Button variant="outline" size="sm" className="text-xs">
+                              Visit Cafe
+                            </Button>
+                          </Link>
+                          <Button
+                            className="food-button food-button-employee"
+                            size="sm"
+                            onClick={() => handleAddToCart(result.menu_item, result.cafe)}
+                            disabled={!result.menu_item.is_available || result.menu_item.available_quantity <= 0}
+                          >
+                            <Plus className="h-4 w-4 mr-1" />
+                            Add
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : searchQuery ? (
+          <Card className="text-center p-8">
+            <SearchIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">No results found</h3>
+            <p className="text-gray-600">
+              No food items found for "{searchQuery}". Try different keywords or browse cafes directly.
+            </p>
+            <Link to="/employee/cafes" className="mt-4 inline-block">
+              <Button variant="employee">
+                Browse Cafes
+              </Button>
+            </Link>
+          </Card>
+        ) : (
+          <Card className="text-center p-8">
+            <SearchIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Search for Food</h3>
+            <p className="text-gray-600">
+              Enter keywords to find your favorite food items across all cafes.
+            </p>
+          </Card>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default Search

@@ -1,0 +1,544 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom mobile-first styles */
+@layer components {
+  .mobile-touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Employee theme - clean, light, welcoming */
+  .employee-theme {
+    --primary: 45 93% 47%; /* Soft amber */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 213 94% 68%; /* Soft blue */
+    --secondary-foreground: 210 40% 98%;
+    --accent: 158 64% 52%; /* Fresh green */
+    --accent-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --border: 45 93% 47%;
+    --background: 54 91% 95%; /* Light cream */
+  }
+
+  /* Owner theme - warm, vibrant, food-brand inspired */
+  .owner-theme {
+    --primary: 0 78% 44%; /* Bold red */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 24 95% 53%; /* Warm orange */
+    --secondary-foreground: 210 40% 98%;
+    --accent: 45 93% 47%; /* Vibrant amber */
+    --accent-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --border: 0 78% 44%;
+    --background: 0 86% 97%; /* Light warm */
+  }
+
+  /* Modern card styles */
+  .food-card {
+    @apply rounded-xl border-2 shadow-lg transition-all duration-300 hover:shadow-xl;
+  }
+
+  .food-card-employee {
+    @apply border-employee-border/30 ;
+  }
+
+  .food-card-owner {
+    @apply border-owner-border/30 ;
+  }
+
+  /* Button styles inspired by modern food apps */
+  .food-button {
+    @apply rounded-full font-semibold transition-all duration-200 transform hover:scale-105;
+  }
+
+  .food-button-employee {
+    @apply bg-gray-700 hover:bg-gray-800 text-white shadow-lg;
+  }
+
+  .food-button-owner {
+    @apply bg-owner-primary hover:bg-owner-secondary text-white shadow-lg;
+  }
+
+  /* Header styles */
+  .food-header {
+    @apply backdrop-blur-sm bg-white/90 border-b-2 shadow-sm;
+  }
+
+  .food-header-employee {
+    @apply border-employee-border/30;
+  }
+
+  .food-header-owner {
+    @apply border-owner-border/30;
+  }
+
+  /* Employee specific styling overrides */
+  .employee-theme input,
+  .employee-theme textarea,
+  .employee-theme select {
+    @apply bg-white border-gray-300 text-gray-900 placeholder-gray-500 !important;
+  }
+
+  .employee-theme input:focus,
+  .employee-theme textarea:focus,
+  .employee-theme select:focus {
+    @apply ring-2 ring-green-500 border-green-500 !important;
+  }
+
+  /* Default employee buttons - white background */
+  .employee-theme button:not(.search-button):not(.add-to-cart-button):not(.dark-gray-button),
+  .employee-theme .Button:not(.search-button):not(.add-to-cart-button):not(.dark-gray-button) {
+    @apply bg-white border-gray-300 text-gray-900 hover:bg-gray-50 !important;
+  }
+
+  /* Search and add to cart buttons - green theme */
+  .employee-theme .search-button,
+  .employee-theme .add-to-cart-button,
+  .employee-theme .dark-gray-button {
+    @apply bg-green-600 text-white hover:bg-green-700 !important;
+  }
+
+  /* Theme toggle button - white background */
+  .employee-theme .theme-toggle {
+    @apply bg-white border-gray-300 text-gray-900 hover:bg-gray-50 !important;
+  }
+  
+  /* Dark mode overrides for employee buttons */
+  .dark .employee-theme .search-button,
+  .dark .employee-theme .add-to-cart-button,
+  .dark .employee-theme .dark-gray-button {
+    @apply bg-green-600 text-white hover:bg-green-700 !important;
+    color: rgb(255 255 255) !important;
+  }
+  
+  .dark .employee-theme button:not(.search-button):not(.add-to-cart-button):not(.dark-gray-button),
+  .dark .employee-theme .Button:not(.search-button):not(.add-to-cart-button):not(.dark-gray-button) {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-color: rgba(71, 85, 105, 0.3) !important;
+    color: rgb(241 245 249) !important;
+  }
+  
+  .dark .employee-theme .theme-toggle {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-color: rgba(71, 85, 105, 0.3) !important;
+    color: rgb(241 245 249) !important;
+  }
+}
+
+/* Mobile-first responsive utilities */
+@layer utilities {
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Mobile-optimized touch targets */
+  .mobile-touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Enhanced mobile experience */
+  .mobile-button {
+    @apply min-h-[48px] px-6 py-3 text-base font-semibold rounded-xl transition-all duration-200 transform active:scale-95;
+  }
+
+  .mobile-card {
+    @apply p-4 mb-4 rounded-xl shadow-lg border-2 transition-all duration-300;
+  }
+
+  .mobile-header {
+    @apply p-4 mb-4 sticky top-0 z-10 backdrop-blur-sm bg-white/90;
+  }
+
+  .mobile-grid {
+    @apply gap-3;
+  }
+
+  .mobile-text-lg {
+    @apply text-lg leading-relaxed;
+  }
+
+  .mobile-spacing {
+    @apply space-y-4;
+  }
+
+  /* Comprehensive Dark Mode Styling */
+
+  /* Base dark mode styles */
+  .dark {
+    color-scheme: dark;
+  }
+
+  .dark body {
+    background: rgb(15 23 42) !important;
+    color: rgb(241 245 249) !important;
+  }
+
+  /* Main background overrides for dark mode */
+  .dark .min-h-screen {
+    background: rgb(15 23 42) !important;
+  }
+
+  .dark .employee-theme {
+    background: linear-gradient(to bottom right, rgb(15 23 42), rgb(30 41 59), rgb(15 23 42)) !important;
+  }
+
+  .dark .owner-theme {
+    background: linear-gradient(to bottom right, rgb(15 23 42), rgb(30 41 59), rgb(15 23 42)) !important;
+  }
+
+  /* Header styles for dark mode */
+  .dark .mobile-header,
+  .dark .food-header,
+  .dark .food-header-employee,
+  .dark .food-header-owner {
+    background: rgba(30, 41, 59, 0.95) !important;
+    backdrop-filter: blur(12px);
+    border-color: rgba(71, 85, 105, 0.3) !important;
+  }
+
+  /* Card components dark mode */
+  .dark .food-card,
+  .dark .food-card-employee,
+  .dark .food-card-owner,
+  .dark .Card,
+  .dark [class*="card"],
+  .dark .bg-white,
+  .dark .bg-gradient-to-r,
+  .dark .bg-gradient-to-br,
+  .dark .bg-gradient-to-l {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-color: rgba(71, 85, 105, 0.3) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  /* Special handling for gradient cards */
+  .dark .bg-gradient-to-r.from-white,
+  .dark .bg-gradient-to-br.from-white,
+  .dark .bg-gradient-to-l.from-white {
+    background: linear-gradient(to right, rgba(30, 41, 59, 0.9), rgba(51, 65, 85, 0.8)) !important;
+  }
+
+  .dark .bg-gradient-to-r.from-employee-accent\/10,
+  .dark .bg-gradient-to-r.from-owner-primary\/5 {
+    background: linear-gradient(to right, rgba(30, 41, 59, 0.9), rgba(51, 65, 85, 0.8)) !important;
+  }
+
+  /* Text color overrides for dark mode */
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    color: rgb(241 245 249) !important;
+  }
+
+  .dark p, .dark span, .dark div, .dark label {
+    color: rgb(203 213 225) !important;
+  }
+
+  .dark .text-gray-800 {
+    color: rgb(241 245 249) !important;
+  }
+
+  .dark .text-gray-600 {
+    color: rgb(148 163 184) !important;
+  }
+
+  .dark .text-gray-500 {
+    color: rgb(100 116 139) !important;
+  }
+
+  .dark .text-gray-400 {
+    color: rgb(71 85 105) !important;
+  }
+
+  /* Brand colors for dark mode */
+  .dark .text-brand-800 {
+    color: rgb(241 245 249) !important;
+  }
+
+  .dark .text-brand-600 {
+    color: rgb(203 213 225) !important;
+  }
+
+  .dark .text-brand-500 {
+    color: rgb(148 163 184) !important;
+  }
+
+  /* Input and form styles for dark mode */
+  .dark input, .dark textarea, .dark select {
+    background: rgb(51 65 85) !important;
+    border-color: rgb(71 85 105) !important;
+    color: rgb(241 245 249) !important;
+  }
+
+  .dark input::placeholder, .dark textarea::placeholder {
+    color: rgb(100 116 139) !important;
+  }
+
+  .dark input:focus, .dark textarea:focus, .dark select:focus {
+    ring-color: rgb(71 85 105) !important;
+    border-color: rgb(71 85 105) !important;
+  }
+
+  /* Home page specific dark mode */
+  .dark .bg-gradient-to-br.from-brand-50 {
+    background: linear-gradient(to bottom right, rgb(15 23 42), rgb(30 41 59), rgb(15 23 42)) !important;
+  }
+
+  /* Card backgrounds with transparency for dark mode */
+  .dark .bg-white\/90 {
+    background: rgba(30, 41, 59, 0.9) !important;
+  }
+
+  .dark .bg-white\/60 {
+    background: rgba(30, 41, 59, 0.6) !important;
+  }
+
+  /* Border styles for dark mode */
+  .dark .border-brand-300\/50 {
+    border-color: rgba(71, 85, 105, 0.5) !important;
+  }
+
+  .dark .border-brand-400 {
+    border-color: rgb(71 85 105) !important;
+  }
+
+  .dark .border-employee-primary\/30 {
+    border-color: rgba(16, 185, 129, 0.4) !important;
+  }
+
+  .dark .border-owner-primary\/30 {
+    border-color: rgba(239, 68, 68, 0.4) !important;
+  }
+
+  /* Hover effects for dark mode */
+  .dark .hover\\:bg-employee-primary\/10:hover {
+    background: rgba(16, 185, 129, 0.2) !important;
+  }
+
+  .dark .hover\\:bg-owner-primary\/10:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+  }
+
+  .dark .hover\\:border-employee-primary\/40:hover {
+    border-color: rgba(16, 185, 129, 0.6) !important;
+  }
+
+  /* Theme toggle specific fixes */
+  .dark .theme-toggle {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-color: rgba(71, 85, 105, 0.3) !important;
+    color: rgb(241 245 249) !important;
+  }
+
+  .dark .theme-toggle:hover {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border-color: rgba(71, 85, 105, 0.5) !important;
+  }
+
+  /* Button and form control dark mode fixes */
+  .dark button[class*="outline"],
+  .dark .button-outline {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-color: rgba(71, 85, 105, 0.3) !important;
+    color: rgb(241 245 249) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .dark button[class*="outline"]:hover,
+  .dark .button-outline:hover {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border-color: rgba(71, 85, 105, 0.5) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  /* Enhanced button visibility in dark mode */
+  .dark button,
+  .dark .btn {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(71, 85, 105, 0.3) !important;
+  }
+
+  .dark button:hover,
+  .dark .btn:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    border-color: rgba(71, 85, 105, 0.5) !important;
+  }
+
+  /* Specific button variant enhancements */
+  .dark .food-button,
+  .dark .food-button-employee {
+    background: linear-gradient(135deg, rgb(16 185 129), rgb(5 150 105)) !important;
+    border: 1px solid rgba(16, 185, 129, 0.5) !important;
+    box-shadow: 0 3px 6px rgba(16, 185, 129, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .dark .food-button:hover,
+  .dark .food-button-employee:hover {
+    box-shadow: 0 5px 10px rgba(16, 185, 129, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(16, 185, 129, 0.7) !important;
+  }
+
+  /* Badge and indicator dark mode fixes */
+  .dark .badge,
+  .dark [class*="badge"] {
+    background: rgba(30, 41, 59, 0.9) !important;
+    color: rgb(241 245 249) !important;
+  }
+
+  /* Modal and dialog dark mode fixes */
+  .dark .modal,
+  .dark .dialog,
+  .dark .fixed.inset-0 > div {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border-color: rgba(71, 85, 105, 0.3) !important;
+  }
+
+  .dark .hover\\:border-owner-primary\/40:hover {
+    border-color: rgba(239, 68, 68, 0.6) !important;
+  }
+
+  /* Border outline styles for dark mode */
+  .dark .border-employee-primary\/30.hover\\:bg-employee-primary\/10 {
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    color: rgb(241 245 249) !important;
+  }
+
+  .dark .border-owner-primary\/30.hover\\:bg-owner-primary\/10 {
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: rgb(241 245 249) !important;
+  }
+
+  /* Specific fixes for search and view all buttons in dark mode */
+  .dark .search-button,
+  .dark .add-to-cart-button,
+  .dark .dark-gray-button {
+    background: rgb(22 163 74) !important;
+    color: rgb(255 255 255) !important;
+  }
+  
+  .dark .search-button:hover,
+  .dark .add-to-cart-button:hover,
+  .dark .dark-gray-button:hover {
+    background: rgb(21 128 61) !important;
+  }
+
+  /* All variant outline buttons in dark mode should have white text */
+  .dark button[variant="outline"],
+  .dark .Button[variant="outline"] {
+    color: rgb(241 245 249) !important;
+  }
+
+  /* Employee dashboard specific button text fixes for dark mode */
+  .dark .employee-theme button,
+  .dark .employee-theme .Button,
+  .dark .employee-theme [role="button"] {
+    color: rgb(241 245 249) !important;
+  }
+
+  /* Force white text for all buttons in employee theme dark mode */
+  .dark .employee-theme button * {
+    color: inherit !important;
+  }
+
+  /* Gradient overrides for dark mode */
+  .dark .bg-gradient-to-r.from-brand-500 {
+    background: linear-gradient(to right, rgb(16 185 129), rgb(5 150 105)) !important;
+  }
+
+  .dark .bg-gradient-to-r.from-employee-primary\/10 {
+    background: linear-gradient(to right, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.2)) !important;
+  }
+
+  .dark .bg-gradient-to-r.from-owner-primary\/10 {
+    background: linear-gradient(to right, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.2)) !important;
+  }
+
+  /* Additional background gradients for cards */
+  .dark .bg-gradient-to-br.from-white.to-employee-primary\/5 {
+    background: linear-gradient(to bottom right, rgba(30, 41, 59, 0.9), rgba(16, 185, 129, 0.1)) !important;
+  }
+
+  .dark .bg-gradient-to-br.from-white.to-owner-primary\/5 {
+    background: linear-gradient(to bottom right, rgba(30, 41, 59, 0.9), rgba(239, 68, 68, 0.1)) !important;
+  }
+
+  .dark .bg-gradient-to-r.from-white.to-employee-background\/30 {
+    background: linear-gradient(to right, rgba(30, 41, 59, 0.9), rgba(16, 185, 129, 0.1)) !important;
+  }
+}

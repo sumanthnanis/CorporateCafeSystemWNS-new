@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # User Service (Main API)
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=sqlite:///shared_microservices.db
+      - SECRET_KEY=your-secret-key-here
+      - SERVICE_PORT=8001
+    volumes:
+      - ./shared_microservices.db:/app/shared_microservices.db
+      - ./services/user-service:/app
+    networks:
+      - app-network
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8001
+    depends_on:
+      - user-service
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

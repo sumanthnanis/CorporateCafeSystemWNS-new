@@ -1,0 +1,197 @@
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { employeeAPI, ordersAPI } from '@/lib/api'
+import { formatCurrency, formatDate } from '@/lib/utils'
+import { toast } from '@/hooks/use-toast'
+import { useAuth } from '@/context/AuthContext'
+import { ArrowLeft, Receipt, Clock, XCircle } from 'lucide-react'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
+
+const Orders = () => {
+  const { user } = useAuth()
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [cancelLoading, setCancelLoading] = useState({})
+
+  // Removed WebSocket real-time updates to fix connection issues
+
+
+  useEffect(() => {
+    loadOrders()
+  }, [])
+
+  // Removed WebSocket test notifications
+
+  const loadOrders = async () => {
+    try {
+      const response = await employeeAPI.getMyOrders()
+      setOrders(response.data)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load orders. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCancelOrder = async (orderId, orderNumber) => {
+    setCancelLoading(prev => ({ ...prev, [orderId]: true }))
+    
+    try {
+      await ordersAPI.cancelOrder(orderId)
+      toast({
+        title: "Order Cancelled",
+        description: `Order #${orderNumber} has been cancelled successfully.`,
+      })
+      loadOrders() // Refresh orders list
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.detail || "Failed to cancel order. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setCancelLoading(prev => ({ ...prev, [orderId]: false }))
+    }
+  }
+
+  const getStatusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case 'pending': return 'pending'
+      case 'accepted': return 'accepted'
+      case 'preparing': return 'preparing'
+      case 'ready': return 'ready'
+      case 'delivered': return 'delivered'
+      case 'cancelled': return 'cancelled'
+      default: return 'default'
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 employee-theme">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <Link to="/employee" className="mr-4">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-gray-800">My Orders</h1>
+              {isConnected && (
+                <div className="flex items-center gap-1 text-green-600 text-sm">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  Live Updates
+                </div>
+              )}
+            </div>
+          </div>
+          <ThemeToggle />
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-employee-primary"></div>
+          </div>
+        ) : orders.length === 0 ? (
+          <Card className="text-center p-8">
+            <div className="flex justify-center mb-4">
+              <Receipt className="h-16 w-16 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">No orders yet</h3>
+            <p className="text-gray-600 mb-4">Start by browsing our cafes and placing your first order!</p>
+            <Link to="/employee/cafes">
+              <Button variant="employee" size="lg">
+                Browse Cafes
+              </Button>
+            </Link>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {orders.map((order) => (
+              <Card key={order.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-lg text-gray-800">
+                        Order #{order.order_number}
+                      </h3>
+                      <Badge variant={getStatusColor(order.status)}>
+                        {order.status}
+                      </Badge>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-xl">
+                        {formatCurrency(order.total_amount)}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {formatDate(order.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-gray-600">{order.cafe.name}</p>
+                      {order.estimated_preparation_time && (
+                        <p className="text-sm text-gray-500 flex items-center">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {order.estimated_preparation_time} min
+                        </p>
+                      )}
+                    </div>
+                    
+                    <div className="text-sm text-gray-600">
+                      {order.order_items.length} item{order.order_items.length !== 1 ? 's' : ''}
+                      {order.order_items.length <= 3 && (
+                        <span className="ml-2">
+                          {order.order_items.map(item => item.menu_item.name).join(', ')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 pt-2 border-t">
+                    <Link to={`/employee/orders/${order.id}`} className="flex-1">
+                      <Button variant="outline" className="w-full">
+                        View Details
+                      </Button>
+                    </Link>
+                    {order.status === 'PENDING' && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          handleCancelOrder(order.id, order.order_number)
+                        }}
+                        disabled={cancelLoading[order.id]}
+                      >
+                        {cancelLoading[order.id] ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        ) : (
+                          <XCircle className="h-4 w-4 mr-2" />
+                        )}
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default Orders
