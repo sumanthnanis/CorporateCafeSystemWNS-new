@@ -47,4 +47,4 @@ async def get_current_employee(current_user: User = Depends(get_current_user)) -
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions. Employee access required."
         )
-    return current_user
+    return current_user 
