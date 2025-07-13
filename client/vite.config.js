@@ -4,20 +4,27 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  preview: {
+    port: 5001,
+    strictPort: true,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  base: "/",
   server: {
     allowedHosts: [
       "ee3f4aa2-31c7-4027-9b68-64a1c649745e-00-3aggi0t3zeegh.sisko.replit.dev",
       "ce6b25f-0ced-445a-9b02-455998149ed3-00-kge6s1kjkamo.pike.replit.dev",
       "7ce6b25f-0ced-445a-9b02-455998149ed3-00-kge6s1kjkamo.pike.replit.dev",
-      "b2572ba7-ef4b-4f5e-b700-0ff6d94b6454-00-nn5dqmxi2786.pike.replit.dev"
+      "b2572ba7-ef4b-4f5e-b700-0ff6d94b6454-00-nn5dqmxi2786.pike.replit.dev",
+      "localhost"
     ],
     host: "0.0.0.0",
-    port: 5000,
+    port: 5001,
+    cors: true,
     proxy: {
       // Route admin API requests to Admin Service
       "/api/admin": {

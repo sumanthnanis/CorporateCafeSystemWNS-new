@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Expose port
-EXPOSE 5000
+EXPOSE 5001
 
 # Start the development server
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5001"]
